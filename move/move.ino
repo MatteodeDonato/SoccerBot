@@ -20,10 +20,16 @@ void setup() {
 
 //loop runs repeatedly
 void loop() {   
-
-  frontLeft->run(BACKWARD); 
-  backLeft->run(FORWARD);
-  frontRight->run(FORWARD);
-  backRight->run(BACKWARD);
+ //forward movement
+    frontLeft->run(FORWARD); 
+    backLeft->run(FORWARD);
+    frontRight->run(FORWARD);
+    backRight->run(FORWARD);
+ // sideways
+  //frontLeft->run(BACKWARD); 
+  //backLeft->run(FORWARD);
+  //frontRight->run(FORWARD);
+  //backRight->run(BACKWARD);
+  
   
 }
