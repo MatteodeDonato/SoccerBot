@@ -9,13 +9,13 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *frontRight = motorShield.getMotor(3);
 Adafruit_DCMotor *backRight = motorShield.getMotor(4);
-
+int speed1 = 120;
 void setup() {
-  motorShield.begin();
-  frontLeft->setSpeed(80); 
-  backLeft->setSpeed(80);
-  frontRight->setSpeed(80); 
-  backRight->setSpeed(80); 
+   motorShield.begin();
+  frontLeft->setSpeed(speed1); 
+  backLeft->setSpeed(speed1);
+  frontRight->setSpeed(speed1); 
+  backRight->setSpeed(speed1); 
 }
 
 //loop runs repeatedly
@@ -25,7 +25,7 @@ void loop() {
     backLeft->run(FORWARD);
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
- // sideways
+  //sideways
   //frontLeft->run(BACKWARD); 
   //backLeft->run(FORWARD);
   //frontRight->run(FORWARD);
@@ -33,3 +33,5 @@ void loop() {
   
   
 }
+
+
