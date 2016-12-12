@@ -101,41 +101,46 @@ void setup() {
   Serial.begin(9600);  // start serial for output
   init_TCS34725();
   get_TCS34725ID();     // get the device ID, this is just a test to see if we're connected
-  Readi2cRegisters(8, ColorAddress);
-  clear_color = (unsigned int)(i2cReadBuffer[1] << 8) + (unsigned int)i2cReadBuffer[0];
-  red_color = (unsigned int)(i2cReadBuffer[3] << 8) + (unsigned int)i2cReadBuffer[2];
-  green_color = (unsigned int)(i2cReadBuffer[5] << 8) + (unsigned int)i2cReadBuffer[4];
-  blue_color = (unsigned int)(i2cReadBuffer[7] << 8) + (unsigned int)i2cReadBuffer[6];
+  
 }
 
 
 
 //loop runs repeatedly
 void loop() {
-  //Not compiling version
-  if ((red_color > blue_color) && (red_color > green_color)) {
-    Serial.println("detecting red");
-    frontLeft->run(FORWARD);
-    backLeft->run(FORWARD);
-    frontRight->run(BACKWARD);
-    backRight->run(BACKWARD);
-  }
-  else if ((green_color > blue_color) && (green_color > red_color)) {
-    Serial.println("detecting green");
+
+  delay (10);
+
+  Readi2cRegisters(8, ColorAddress);
+  clear_color = (unsigned int)(i2cReadBuffer[1] << 8) + (unsigned int)i2cReadBuffer[0];
+  red_color = (unsigned int)(i2cReadBuffer[3] << 8) + (unsigned int)i2cReadBuffer[2];
+  green_color = (unsigned int)(i2cReadBuffer[5] << 8) + (unsigned int)i2cReadBuffer[4];
+  blue_color = (unsigned int)(i2cReadBuffer[7] << 8) + (unsigned int)i2cReadBuffer[6];
+
+  //Serial.println(clear_color);
+ // Serial.println(red_color);
+  Serial.println(green_color);
+ // Serial.println(blue_color);
+  
+   if ((green_color > 150)&& (green_color < 400)) {
+   //Serial.println("detecting green");
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
-  }
-  else if ((blue_color > red_color) && (blue_color > green_color)) {
-    Serial.println("detecting blue");
+  }else {
+   //Serial.println("detecting green");
+    frontLeft->run(BACKWARD);
+    backLeft->run(BACKWARD);
+    frontRight->run(BACKWARD);
+    backRight->run(BACKWARD);
+    delay(3000);
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
+    delay(500);
   }
-  else
-    Serial.println("color not detectable");
 }
 
 // working version
