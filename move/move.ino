@@ -4,6 +4,7 @@
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <Math.h>
 
+
 byte i2cWriteBuffer[10];
 byte i2cReadBuffer[10];
 
@@ -101,6 +102,8 @@ void setup() {
   Serial.begin(9600);  // start serial for output
   init_TCS34725();
   get_TCS34725ID();     // get the device ID, this is just a test to see if we're connected
+  Serial.println("Dir\tStrength"); //Prints Dir & Strength at top
+  InfraredSeeker::Initialize(); //initializes the IR sensor
   
 }
 
@@ -109,7 +112,16 @@ void setup() {
 //loop runs repeatedly
 void loop() {
 
-  delay (10);
+  delay (1);
+    //IR
+    InfraredResult InfraredBall = InfraredSeeker::ReadAC();
+  
+  Serial.print(InfraredBall.Direction); //Print the Direction Number
+  Serial.print("\t"); // Print a tab
+  Serial.print(InfraredBall.Strength); //Print the Strength Number
+  Serial.println(); //Print a new line
+  delay(100); //delay a tenth of a second
+    //IR
 
   Readi2cRegisters(8, ColorAddress);
   clear_color = (unsigned int)(i2cReadBuffer[1] << 8) + (unsigned int)i2cReadBuffer[0];
@@ -121,54 +133,50 @@ void loop() {
  // Serial.println(red_color);
   Serial.println(green_color);
  // Serial.println(blue_color);
-  
-   if ((green_color > 150)&& (green_color < 400)) {
-   //Serial.println("detecting green");
+
+//follow ball
+  if ((InfraredBall.Direction > 3)&& (InfraredBall.Direction < 7)) {
+   Serial.println("ball dead ahead");
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
-  }else {
-   //Serial.println("detecting green");
+    
+  }else if ((InfraredBall.Direction > 0)&& (InfraredBall.Direction < 4)){
+   Serial.println("ball to the left");
     frontLeft->run(BACKWARD);
     backLeft->run(BACKWARD);
-    frontRight->run(BACKWARD);
-    backRight->run(BACKWARD);
-    delay(3000);
+    frontRight->run(FORWARD);
+    backRight->run(FORWARD);
+    
+  }
+  else if ((InfraredBall.Direction > 6)&& (InfraredBall.Direction < 8)){
+   Serial.println("ball to the left");
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
-    delay(500);
+    
   }
+  
+  // stay on green
+   if ((green_color > 150)&& (green_color < 200)) {
+   Serial.println("detecting green");
+  }else {
+   Serial.println("detecting not green");
+    frontLeft->run(BACKWARD);
+    backLeft->run(BACKWARD);
+    frontRight->run(BACKWARD);
+    backRight->run(BACKWARD);
+    delay(1000);
+    frontLeft->run(FORWARD);
+    backLeft->run(FORWARD);
+    frontRight->run(BACKWARD);
+    backRight->run(BACKWARD);
+    delay(800); 
+  }
+  
 }
-
-// working version
-//if((red_color>blue_color) && (red_color>green_color)){
-//Serial.println("detecting red");
-//frontLeft->run(FORWARD);
-//backLeft->run(FORWARD);
-//frontRight->run(BACKWARD);
-// backRight->run(FORWARD);
-// }
-//  else if((green_color>blue_color) && (green_color>red_color)){
-//    Serial.println("detecting green")
-//    frontLeftDirection = FORWARD;
-//    backLeftDirection = FORWARD;
-//    frontRightDirection = FORWARD;
-//    backRightDirection = FORWARD;
-//}
-//  else if((blue_color>red_color) && (blue_color>green_color)){
-//    Serial.println("detecting blue");
-//    frontLeftDirection = FORWARD;
-//    backLeftDirection = FORWARD;
-//    frontRightDirection = BACKWARD;
-//    backRightDirection = BACKWARD;
-//  }
-//  else
-//    Serial.println("color not detectable");
-//    }
-
 
 
 
