@@ -21,6 +21,12 @@ void loop(){
 
   frontMotor->setSpeed(255); 
   frontMotor->run(FORWARD);
+  rightMotor->setSpeed(255); 
+  rightMotor->run(BACKWARD);
+  leftMotor->setSpeed(255); 
+  leftMotor->run(BACKWARD);
+  Motor->setSpeed(255); 
+  Motor->run(FORWARD);
 
   
 }
