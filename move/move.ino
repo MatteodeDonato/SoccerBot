@@ -90,7 +90,7 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *frontRight = motorShield.getMotor(3);
 Adafruit_DCMotor *backRight = motorShield.getMotor(4);
-int speed1 = 120;
+int speed1 = 225;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
@@ -112,7 +112,7 @@ void setup() {
 //loop runs repeatedly
 void loop() {
 
-  delay (1);
+  delay (.01);
     //IR
     InfraredResult InfraredBall = InfraredSeeker::ReadAC();
   
@@ -120,7 +120,9 @@ void loop() {
   Serial.print("\t"); // Print a tab
   Serial.print(InfraredBall.Strength); //Print the Strength Number
   Serial.println(); //Print a new line
-  delay(100); //delay a tenth of a second
+  
+  //delay(100); //delay a tenth of a second
+  
     //IR
 
   Readi2cRegisters(8, ColorAddress);
@@ -168,12 +170,12 @@ void loop() {
     backLeft->run(BACKWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
-    delay(1000);
+    delay(500);
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
-    delay(800); 
+    delay(200); 
   }
   
 }
