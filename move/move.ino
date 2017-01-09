@@ -90,7 +90,7 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *frontRight = motorShield.getMotor(3);
 Adafruit_DCMotor *backRight = motorShield.getMotor(4);
-int speed1 = 225;
+int speed1 = 100;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
@@ -139,31 +139,32 @@ void loop() {
 //follow ball
   if ((InfraredBall.Direction > 3)&& (InfraredBall.Direction < 7)) {
    Serial.println("ball dead ahead");
-    frontLeft->run(FORWARD);
-    backLeft->run(FORWARD);
-    frontRight->run(FORWARD);
-    backRight->run(FORWARD);
-    
-  }else if ((InfraredBall.Direction > 0)&& (InfraredBall.Direction < 4)){
-   Serial.println("ball to the left");
     frontLeft->run(BACKWARD);
     backLeft->run(BACKWARD);
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
     
-  }
-  else if ((InfraredBall.Direction > 6)&& (InfraredBall.Direction < 8)){
+  }else if ((InfraredBall.Direction > 0)&& (InfraredBall.Direction < 4)){
    Serial.println("ball to the left");
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
+    frontRight->run(FORWARD);
+    backRight->run(FORWARD);
+    
+  }
+  else if ((InfraredBall.Direction > 6)&& (InfraredBall.Direction < 8)){
+   Serial.println("ball to the right");
+    frontLeft->run(BACKWARD);
+    backLeft->run(BACKWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
     
   }
   
   // stay on green
-   if ((green_color > 150)&& (green_color < 200)) {
+   if ((green_color > 170)&& (green_color < 300)) {
    Serial.println("detecting green");
+   //delay(500);
   }else {
    Serial.println("detecting not green");
     frontLeft->run(BACKWARD);
