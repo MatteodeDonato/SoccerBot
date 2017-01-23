@@ -3,6 +3,10 @@
 #include <HTInfraredSeeker.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <Math.h>
+#include <Wire.h>
+int compassAddress = 0x01; //we got this from I2C Scanner
+int TestValue;  //variable where we will store compass heading
+int FWD;
 
 
 byte i2cWriteBuffer[10];
@@ -104,26 +108,58 @@ void setup() {
   get_TCS34725ID();     // get the device ID, this is just a test to see if we're connected
   Serial.println("Dir\tStrength"); //Prints Dir & Strength at top
   InfraredSeeker::Initialize(); //initializes the IR sensor
+
+  Serial.begin(9600); //sets up Serial monitor
+  //The code below turns on i2c, opens communication to compass
+  //sensor, and does a test connection.
+  Wire.begin();  //turn on i2c
+  Wire.beginTransmission(compassAddress); //open communication to sensor
+  Wire.write(0x00); //blank packet
+  Wire.endTransmission(); //close communication
+  while (Wire.available() > 0)
+    Wire.read();
+
   
+  ReadCompassSensor();
+  FWD = TestValue;
+
 }
 
 
+void ReadCompassSensor() {
+  //this code lets the arduino know you want to talk to the compass Sensor
+  Wire.beginTransmission(compassAddress);
+  Wire.write(0x44);
+  Wire.endTransmission();
 
+  //the code below requests 2 bytes of information and then combines them
+  //to make a number 0-360 that it saves in the variable TestValue
+  Wire.requestFrom(compassAddress, 2);
+  while (Wire.available() < 2);
+  byte lowbyte = Wire.read();
+  byte highbyte = Wire.read();
+  TestValue = word(highbyte, lowbyte);
+}
 //loop runs repeatedly
 void loop() {
 
-  delay (.01);
-    //IR
-    InfraredResult InfraredBall = InfraredSeeker::ReadAC();
-  
+  ReadCompassSensor();  //calls the function listed below
+  Serial.print("compass:\t"); //prints the compass heading
+  Serial.println(TestValue);
+  //delay(1); //delay for reading output
+
+  //delay (1);
+  //IR
+  InfraredResult InfraredBall = InfraredSeeker::ReadAC();
+
   Serial.print(InfraredBall.Direction); //Print the Direction Number
   Serial.print("\t"); // Print a tab
   Serial.print(InfraredBall.Strength); //Print the Strength Number
   Serial.println(); //Print a new line
-  
+
   //delay(100); //delay a tenth of a second
-  
-    //IR
+
+  //IR
 
   Readi2cRegisters(8, ColorAddress);
   clear_color = (unsigned int)(i2cReadBuffer[1] << 8) + (unsigned int)i2cReadBuffer[0];
@@ -132,41 +168,41 @@ void loop() {
   blue_color = (unsigned int)(i2cReadBuffer[7] << 8) + (unsigned int)i2cReadBuffer[6];
 
   //Serial.println(clear_color);
- // Serial.println(red_color);
+  // Serial.println(red_color);
   Serial.println(green_color);
- // Serial.println(blue_color);
+  // Serial.println(blue_color);
 
-//follow ball
-  if ((InfraredBall.Direction > 3)&& (InfraredBall.Direction < 7)) {
-   Serial.println("ball dead ahead");
+  //follow ball
+  if ((InfraredBall.Direction > 3) && (InfraredBall.Direction < 7)) {
+    Serial.println("ball dead ahead");
     frontLeft->run(BACKWARD);
     backLeft->run(BACKWARD);
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
-    
-  }else if ((InfraredBall.Direction > 0)&& (InfraredBall.Direction < 4)){
-   Serial.println("ball to the left");
+
+  } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
+    Serial.println("ball to the left");
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
-    
+
   }
-  else if ((InfraredBall.Direction > 6)&& (InfraredBall.Direction < 8)){
-   Serial.println("ball to the right");
+  else if ((InfraredBall.Direction > 6) && (InfraredBall.Direction < 8)) {
+    Serial.println("ball to the right");
     frontLeft->run(BACKWARD);
     backLeft->run(BACKWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
-    
+
   }
-  
+
   // stay on green
-   if ((green_color > 170)&& (green_color < 300)) {
-   Serial.println("detecting green");
-   //delay(500);
-  }else {
-   Serial.println("detecting not green");
+  if ((green_color > 170) && (green_color < 300)) {
+    Serial.println("detecting green");
+    //delay(500);
+  } else {
+    Serial.println("detecting not green");
     frontLeft->run(BACKWARD);
     backLeft->run(BACKWARD);
     frontRight->run(BACKWARD);
@@ -176,9 +212,34 @@ void loop() {
     backLeft->run(FORWARD);
     frontRight->run(BACKWARD);
     backRight->run(BACKWARD);
-    delay(200); 
+    delay(200);
   }
-  
+//GO TO GOAL
+if ((TestValue > FWD-10) && (TestValue < (FWD+10)%360)) {
+    Serial.println("GOAL dead ahead");
+    frontLeft->run(BACKWARD);
+    backLeft->run(BACKWARD);
+    frontRight->run(FORWARD);
+    backRight->run(FORWARD);
+
+  } else if ((TestValue < FWD-10) && (TestValue > (FWD-180)%360)) {
+    Serial.println("GOAL to the left");
+    frontLeft->run(FORWARD);
+    backLeft->run(FORWARD);
+    frontRight->run(FORWARD);
+    backRight->run(FORWARD);
+
+  }
+  else if ((TestValue > FWD+10) && (TestValue > (FWD+180)%360)) {
+    Serial.println("GOAL to the right");
+    frontLeft->run(BACKWARD);
+    backLeft->run(BACKWARD);
+    frontRight->run(BACKWARD);
+    backRight->run(BACKWARD);
+
+  }
+  else
+    Serial.println("GOAL???");
 }
 
 
