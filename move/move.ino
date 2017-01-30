@@ -7,6 +7,17 @@
 int compassAddress = 0x01; //we got this from I2C Scanner
 int TestValue;  //variable where we will store compass heading
 int FWD;
+int inPin = 2;         // the number of the input pin
+int outPin = 13;       // the number of the output pin
+
+int state = HIGH;      // the current state of the output pin
+int reading;           // the current reading from the input pin
+int previous = LOW;    // the previous reading from the input pin
+
+// the follow variables are long's because the time, measured in miliseconds,
+// will quickly become a bigger number than can be stored in an int.
+long time = 0;         // the last time the output pin was toggled
+long debounce = 200;   // the debounce time, increase if the output flickers
 
 
 byte i2cWriteBuffer[10];
@@ -119,9 +130,12 @@ void setup() {
   while (Wire.available() > 0)
     Wire.read();
 
-  
+
   ReadCompassSensor();
   FWD = TestValue;
+
+  pinMode(inPin, INPUT);
+  pinMode(outPin, OUTPUT);
 
 }
 
@@ -171,33 +185,8 @@ void loop() {
   // Serial.println(red_color);
   Serial.println(green_color);
   // Serial.println(blue_color);
-
-  //follow ball
-  if ((InfraredBall.Direction > 3) && (InfraredBall.Direction < 7)) {
-    Serial.println("ball dead ahead");
-    frontLeft->run(BACKWARD);
-    backLeft->run(BACKWARD);
-    frontRight->run(FORWARD);
-    backRight->run(FORWARD);
-
-  } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
-    Serial.println("ball to the left");
-    frontLeft->run(FORWARD);
-    backLeft->run(FORWARD);
-    frontRight->run(FORWARD);
-    backRight->run(FORWARD);
-
-  }
-  else if ((InfraredBall.Direction > 6) && (InfraredBall.Direction < 8)) {
-    Serial.println("ball to the right");
-    frontLeft->run(BACKWARD);
-    backLeft->run(BACKWARD);
-    frontRight->run(BACKWARD);
-    backRight->run(BACKWARD);
-
-  }
-
   // stay on green
+
   if ((green_color > 170) && (green_color < 300)) {
     Serial.println("detecting green");
     //delay(500);
@@ -214,32 +203,83 @@ void loop() {
     backRight->run(BACKWARD);
     delay(200);
   }
-//GO TO GOAL
-if ((TestValue > FWD-10) && (TestValue < (FWD+10)%360)) {
-    Serial.println("GOAL dead ahead");
-    frontLeft->run(BACKWARD);
-    backLeft->run(BACKWARD);
-    frontRight->run(FORWARD);
-    backRight->run(FORWARD);
 
-  } else if ((TestValue < FWD-10) && (TestValue > (FWD-180)%360)) {
-    Serial.println("GOAL to the left");
-    frontLeft->run(FORWARD);
-    backLeft->run(FORWARD);
-    frontRight->run(FORWARD);
-    backRight->run(FORWARD);
+  if (reading == HIGH && previous == LOW && millis() - time > debounce) {
+    if (state == LOW) {
 
+      time = millis();
+
+      if ((InfraredBall.Direction > 3) && (InfraredBall.Direction < 7)) {
+        Serial.println("ball dead ahead");
+        frontLeft->run(BACKWARD);
+        backLeft->run(BACKWARD);
+        frontRight->run(FORWARD);
+        backRight->run(FORWARD);
+
+      } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
+        Serial.println("ball to the left");
+        frontLeft->run(FORWARD);
+        backLeft->run(FORWARD);
+        frontRight->run(FORWARD);
+        backRight->run(FORWARD);
+
+      }
+      else if ((InfraredBall.Direction > 6) && (InfraredBall.Direction < 8)) {
+        Serial.println("ball to the right");
+        frontLeft->run(BACKWARD);
+        backLeft->run(BACKWARD);
+        frontRight->run(BACKWARD);
+        backRight->run(BACKWARD);
+
+      }
+    }
+    else {
+
+      //GO TO GOAL
+
+      reading = digitalRead(inPin);
+
+      // if the input just went from LOW and HIGH and we've waited long enough
+      // to ignore any noise on the circuit, toggle the output pin and remember
+      // the time
+      if (reading == HIGH && previous == LOW && millis() - time > debounce) {
+        if (state == HIGH)
+
+          time = millis();
+
+
+
+        digitalWrite(outPin, state);
+
+        previous = reading;
+        if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
+          Serial.println("GOAL dead ahead");
+          frontLeft->run(BACKWARD);
+          backLeft->run(BACKWARD);
+          frontRight->run(FORWARD);
+          backRight->run(FORWARD);
+
+        } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
+          Serial.println("GOAL to the left");
+          frontLeft->run(FORWARD);
+          backLeft->run(FORWARD);
+          frontRight->run(FORWARD);
+          backRight->run(FORWARD);
+
+        }
+        else if ((TestValue > FWD + 10) && (TestValue > (FWD + 180) % 360)) {
+          Serial.println("GOAL to the right");
+          frontLeft->run(BACKWARD);
+          backLeft->run(BACKWARD);
+          frontRight->run(BACKWARD);
+          backRight->run(BACKWARD);
+
+        }
+        else
+          Serial.println("GOAL???");
+      }
+    }
   }
-  else if ((TestValue > FWD+10) && (TestValue > (FWD+180)%360)) {
-    Serial.println("GOAL to the right");
-    frontLeft->run(BACKWARD);
-    backLeft->run(BACKWARD);
-    frontRight->run(BACKWARD);
-    backRight->run(BACKWARD);
-
-  }
-  else
-    Serial.println("GOAL???");
 }
 
 
