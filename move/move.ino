@@ -248,6 +248,7 @@ void loop() {
           time = millis();
 
 
+//spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
 
         digitalWrite(outPin, state);
 
