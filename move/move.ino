@@ -249,6 +249,12 @@ void loop() {
 
 
 //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
+         if(//ultrasonic dist//)
+          digitalWrite(13, HIGH)
+          digitalWrite(12, LOW)
+         else
+          digitalWrite(13, LOW)
+          digitalWrite(12, HIGH)
 
         digitalWrite(outPin, state);
 
