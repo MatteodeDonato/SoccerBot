@@ -7,13 +7,8 @@
 int compassAddress = 0x01; //we got this from I2C Scanner
 int TestValue;  //variable where we will store compass heading
 int FWD;
-int inPin = 0;         // the number of the input pin
-int outPin = 1;       // the number of the output pin
-
-int state = HIGH;      // the current state of the output pin
-int reading;           // the current reading from the input pin
-int previous = LOW;    // the previous reading from the input pin
-
+const int buttonPin = 2;     // the number of the pushbutton pin
+int buttonState = 0;         // variable for reading the pushbutton status
 // the follow variables are long's because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
 long time = 0;         // the last time the output pin was toggled
@@ -55,8 +50,8 @@ void Writei2cRegisters(byte numberbytes, byte command)
 
   Wire.beginTransmission(SensorAddressWrite);   // Send address with Write bit set
   Wire.write(command);                          // Send command, normally the register address
-  for (i = 0; i < numberbytes; i++) 
-  // Send data
+  for (i = 0; i < numberbytes; i++)
+    // Send data
     Wire.write(i2cWriteBuffer[i]);
   Wire.endTransmission();
 
@@ -102,8 +97,8 @@ void get_TCS34725ID(void)
   Readi2cRegisters(1, IDAddress);
   if (i2cReadBuffer[0] = 0x44)
     Serial.println("TCS34725 is present");
-  else
-    Serial.println("TCS34725 not responding");
+
+  Serial.println("TCS34725 not responding");
 }
 
 
@@ -113,7 +108,7 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *frontRight = motorShield.getMotor(3);
 Adafruit_DCMotor *backRight = motorShield.getMotor(4);
-int speed1 = 100;
+int speed1 = 50;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
@@ -142,8 +137,7 @@ void setup() {
   ReadCompassSensor();
   FWD = TestValue;
 
-  pinMode(inPin, INPUT);
-  pinMode(outPin, OUTPUT);
+  pinMode(buttonPin, INPUT);
 
   //ULTRASONIC
 
@@ -206,7 +200,7 @@ void loop() {
 
   if ((green_color > 170) && (green_color < 300)) {
     Serial.println("detecting green");
-    //delay(500);
+    delay(500);
   } else {
     Serial.println("detecting not green");
     frontLeft->run(BACKWARD);
@@ -221,130 +215,146 @@ void loop() {
     delay(200);
   }
 
- /* if (reading == HIGH && previous == LOW && millis() - time > debounce) {
-    if (state == LOW) {
 
-      time = millis();
 
-      if ((InfraredBall.Direction > 3) && (InfraredBall.Direction < 7)) {
-        Serial.println("ball dead ahead");
-        frontLeft->run(BACKWARD);
-        backLeft->run(BACKWARD);
-        frontRight->run(FORWARD);
-        backRight->run(FORWARD);
 
-      } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
-        Serial.println("ball to the left");
-        frontLeft->run(FORWARD);
-        backLeft->run(FORWARD);
-        frontRight->run(FORWARD);
-        backRight->run(FORWARD);
+  buttonState = digitalRead(buttonPin);
+  Serial.println(buttonState);
 
-      }
-      else if ((InfraredBall.Direction > 6) && (InfraredBall.Direction < 8)) {
-        Serial.println("ball to the right");
-        frontLeft->run(BACKWARD);
-        backLeft->run(BACKWARD);
-        frontRight->run(BACKWARD);
-        backRight->run(BACKWARD);
+  
+  // check if the pushbutton is pressed.
+  // if it is, the buttonState is HIGH:
+  if (buttonState ==  LOW ) {
+   
 
-      }
+
+
+    if ((InfraredBall.Direction > 3) && (InfraredBall.Direction < 7)) {
+      Serial.println("ball dead ahead");
+      frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+      frontRight->run(FORWARD);
+      backRight->run(FORWARD);
+
+    } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
+      Serial.println("ball to the left");
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+      frontRight->run(FORWARD);
+      backRight->run(FORWARD);
+
+    }
+    else if ((InfraredBall.Direction > 6) && (InfraredBall.Direction < 8)) {
+      Serial.println("ball to the right");
+      frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+      frontRight->run(BACKWARD);
+      backRight->run(BACKWARD);
+
+    }
+  }
+
+
+
+
+
+  //GO TO GOAL
+
+  //botton press here
+  else {
+
+
+
+
+
+
+
+    // if the input just went from LOW and HIGH and we've waited long enough
+    // to ignore any noise on the circuit, toggle the output pin and remember
+    // the tim
+
+
+    //UTRASONIC
+
+    unsigned long t1;
+    unsigned long t2;
+    unsigned long pulse_width;
+    float cm;
+    float inches;
+
+    // Hold the trigger pin high for at least 10 us
+    digitalWrite(TRIG_PIN, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(TRIG_PIN, LOW);
+
+    // Wait for pulse on echo pin
+    while ( digitalRead(ECHO_PIN) == 0 );
+
+    // Measure how long the echo pin was held high (pulse width)
+    // Note: the micros() counter will overflow after ~70 min
+    t1 = micros();
+    while ( digitalRead(ECHO_PIN) == 1);
+    t2 = micros();
+    pulse_width = t2 - t1;
+
+    // Calculate distance in centimeters and inches. The constants
+    // are found in the datasheet, and calculated from the assumed speed
+    //of sound in air at sea level (~340 m/s).
+    cm = pulse_width / 58.0;
+    inches = pulse_width / 148.0;
+
+    // Print out results
+    if ( pulse_width > MAX_DIST ) {
+      Serial.println("Out of range");
+    } else {
+      Serial.println(cm);
+      Serial.print(" cm \t");
+      Serial.println(inches);
+      Serial.print(" in");
+    }
+
+
+    //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
+    if (cm <= 20) {
+      digitalWrite(3, HIGH);
+      digitalWrite(2, LOW);
     }
     else {
-
-      //GO TO GOAL
-
-      reading = digitalRead(inPin);
-
-      // if the input just went from LOW and HIGH and we've waited long enough
-      // to ignore any noise on the circuit, toggle the output pin and remember
-      // the time
-      if (reading == HIGH && previous == LOW && millis() - time > debounce) {
-        if (state == HIGH)
-
-          time = millis();
-*/
-        //UTRASONIC
-
-        unsigned long t1;
-        unsigned long t2;
-        unsigned long pulse_width;
-        float cm;
-        float inches;
-
-        // Hold the trigger pin high for at least 10 us
-        digitalWrite(TRIG_PIN, HIGH);
-        delayMicroseconds(10);
-        digitalWrite(TRIG_PIN, LOW);
-
-        // Wait for pulse on echo pin
-        while ( digitalRead(ECHO_PIN) == 0 );
-
-        // Measure how long the echo pin was held high (pulse width)
-        // Note: the micros() counter will overflow after ~70 min
-        t1 = micros();
-        while ( digitalRead(ECHO_PIN) == 1);
-        t2 = micros();
-        pulse_width = t2 - t1;
-
-        // Calculate distance in centimeters and inches. The constants
-        // are found in the datasheet, and calculated from the assumed speed
-        //of sound in air at sea level (~340 m/s).
-        cm = pulse_width / 58.0;
-        inches = pulse_width / 148.0;
-
-        // Print out results
-        if ( pulse_width > MAX_DIST ) {
-          Serial.println("Out of range");
-        } else {
-          Serial.print(cm);
-          Serial.print(" cm \t");
-          Serial.print(inches);
-          Serial.println(" in");
-       }
+      digitalWrite(2, LOW);
+      digitalWrite(3, HIGH);
+    }
 
 
-        //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
-        if (cm<=20){
-          digitalWrite(2, HIGH);
-          digitalWrite(3, LOW);
-      }
-          else{
-            digitalWrite(2, LOW);
-            digitalWrite(3, HIGH);
-          }
-            digitalWrite(outPin, state);
 
-            previous = reading;
-          if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
-            Serial.println("GOAL dead ahead");
-              frontLeft->run(BACKWARD);
-              backLeft->run(BACKWARD);
-              frontRight->run(FORWARD);
-              backRight->run(FORWARD);
+    if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
+      Serial.println("GOAL dead ahead");
+      frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+      frontRight->run(FORWARD);
+      backRight->run(FORWARD);
 
-            } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
-            Serial.println("GOAL to the left");
-              frontLeft->run(FORWARD);
-              backLeft->run(FORWARD);
-              frontRight->run(FORWARD);
-              backRight->run(FORWARD);
+    } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
+      Serial.println("GOAL to the left");
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+      frontRight->run(FORWARD);
+      backRight->run(FORWARD);
 
-            }
-            else if ((TestValue > FWD + 10) && (TestValue > (FWD + 180) % 360)) {
-            Serial.println("GOAL to the right");
-              frontLeft->run(BACKWARD);
-              backLeft->run(BACKWARD);
-              frontRight->run(BACKWARD);
-              backRight->run(BACKWARD);
+    }
+    else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
+      Serial.println("GOAL to the right");
+      frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+      frontRight->run(BACKWARD);
+      backRight->run(BACKWARD);
 
-            }
-            else
-              Serial.println("GOAL???");
-            }
-//    }
-//  }
-//}
+    }
+    else
+      Serial.println("GOAL???");
+  }
+
+}
+
 
 
 
