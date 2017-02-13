@@ -198,7 +198,7 @@ void loop() {
   // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 170) && (green_color < 300)) {
+  if ((green_color > 750) && (green_color < 1400)) {
     Serial.println("detecting green");
     delay(500);
   } else {
