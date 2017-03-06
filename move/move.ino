@@ -4,6 +4,17 @@
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <Math.h>
 #include <Wire.h>
+#include <Servo.h> 
+
+//BRUSHLESSMOTOR
+Servo esc;
+
+int escPin = 6;
+int minPulseRate = 1000;
+int maxPulseRate = 2000;
+int throttleChangeDelay = 100;
+
+
 int compassAddress = 0x01; //we got this from I2C Scanner
 int TestValue;  //variable where we will store compass heading
 int FWD;
@@ -148,6 +159,17 @@ void setup() {
   // We'll use the serial monitor to view the sensor output
   Serial.begin(9600);
 
+
+//ESC
+
+Serial.begin(9600);
+  Serial.setTimeout(500);
+  
+  // Attach the the servo to the correct pin and set the pulse range
+  esc.attach(escPin, minPulseRate, maxPulseRate); 
+  // Write a minimum value (most ESCs require this correct startup)
+  esc.write(0);
+
 }
 
 
@@ -264,8 +286,20 @@ void loop() {
   else {
 
 
-
-
+  // Wait for some input
+  if (Serial.available() > 0) {
+    
+    // Read the new throttle value
+    int throttle = normalizeThrottle( Serial.parseInt() );
+    
+    // Print it out
+    Serial.print("Setting throttle to: ");
+    Serial.println(throttle);
+    
+    // Change throttle to the new value
+    changeThrottle(throttle);
+    
+  }
 
 
 
@@ -357,5 +391,41 @@ void loop() {
 
 
 
+void changeThrottle(int throttle) {
+  
+  // Read the current throttle value
+  int currentThrottle = readThrottle();
+  
+  // Are we going up or down?
+  int step = 1;
+  if( throttle < currentThrottle )
+    step = -1;
+  
+  // Slowly move to the new throttle value 
+  while( currentThrottle != throttle ) {
+    esc.write(currentThrottle + step);
+    currentThrottle = readThrottle();
+    delay(throttleChangeDelay);
+  }
+  
+}
+
+int readThrottle() {
+  int throttle = esc.read();
+  
+  Serial.print("Current throttle is: ");
+  Serial.println(throttle);
+  
+  return throttle;
+}
+
+// Ensure the throttle value is between 0 - 180
+int normalizeThrottle(int value) {
+  if( value < 0 )
+    return 0;
+  if( value > 180 )
+    return 180;
+  return value;
+}
 
 
