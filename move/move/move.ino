@@ -10,7 +10,7 @@
 int compassAddress = 0x01; //we got this from I2C Scanner
 int TestValue;  //variable where we will store compass heading
 int FWD;
-const int buttonPin = 2;     // the number of the pushbutton pin
+const int buttonPin = 6;     // the number of the pushbutton pin
 int buttonState = 0;         // variable for reading the pushbutton status
 // the follow variables are long's because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
@@ -205,7 +205,7 @@ void loop() {
 
   if ((green_color > 750) && (green_color < 1400)) {
     Serial.println("detecting green");
-    delay(500);
+    delay(200);
   } else {
     Serial.println("detecting not green");
     frontLeft->run(BACKWARD);
@@ -240,7 +240,6 @@ void loop() {
       backLeft->run(BACKWARD);
       frontRight->run(FORWARD);
       backRight->run(FORWARD);
-
     } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
       Serial.println("ball to the left");
       frontLeft->run(FORWARD);
