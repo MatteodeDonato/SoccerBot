@@ -47,6 +47,20 @@ const unsigned int MAX_DIST = 23200;
   Send register address and the byte value you want to write the magnetometer and
   loads the destination register with the value you send
 */
+
+
+
+//Brushless ESC's
+Servo myservo1;  // create servo object to control a servo 
+ 
+int val;    // variable to read the value from the analog pin 
+
+Servo myservo2;  // create servo object to control a servo 
+ 
+
+
+
+ 
 void Writei2cRegisters(byte numberbytes, byte command)
 {
   byte i = 0;
@@ -152,7 +166,13 @@ void setup() {
   Serial.begin(9600);
 
 
+//Brushless ESC's
 
+Serial.begin(9600);
+  myservo1.attach(9);  // attaches the servo on pin 9 to the servo object 
+
+Serial.begin(9600);
+ myservo2.attach(8);  // attaches the servo on pin 8 to the servo object 
 }
 
 
@@ -172,6 +192,19 @@ void ReadCompassSensor() {
 }
 //loop runs repeatedly
 void loop() {
+
+
+//Brushless test
+val = 1050;
+  delay(500);
+  myservo1.writeMicroseconds(val);
+  Serial.println(val);
+
+val = 1050;
+  delay(500);
+  myservo2.writeMicroseconds(val);
+  Serial.println(val);
+
 
   ReadCompassSensor();  //calls the function listed below
   Serial.print("compass:\t"); //prints the compass heading
