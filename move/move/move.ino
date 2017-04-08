@@ -52,9 +52,9 @@ const unsigned int MAX_DIST = 23200;
 //Brushless
 
 
-Servo myservo1;  // create servo object to control a servo
+Servo Brush1;  // create servo object to control a servo
 
-Servo myservo2;  // create servo object to control a servo
+Servo Brush2;  // create servo object to control a servo
 
 int val1;    // variable to read the value from the analog pin
 int val2;    // variable to read the value from the analog pin
@@ -166,8 +166,8 @@ void setup() {
 
   //brushless
 
-  myservo1.attach(8);  // attaches the servo on pin 9 to the servo object
-  myservo2.attach(9);  // attaches the servo on pin 9 to the servo object
+  Brush1.attach(8);  // attaches the servo on pin 9 to the servo object
+  Brush2.attach(9);  // attaches the servo on pin 9 to the servo object
 }
 
 
@@ -214,10 +214,16 @@ void loop() {
   green_color = (unsigned int)(i2cReadBuffer[5] << 8) + (unsigned int)i2cReadBuffer[4];
   blue_color = (unsigned int)(i2cReadBuffer[7] << 8) + (unsigned int)i2cReadBuffer[6];
 
-  //Serial.println(clear_color);
-  // Serial.println(red_color);
+
+  //color sensing
+  Serial.println("Clear");
+  Serial.println(clear_color);
+  Serial.println("Red");
+  Serial.println(red_color);
+  Serial.println("Green");
   Serial.println(green_color);
-  // Serial.println(blue_color);
+  Serial.println("Blue");
+  Serial.println(blue_color);
   // stay on green
 
   if ((green_color > 150) && (green_color < 230)) {
@@ -251,7 +257,7 @@ void loop() {
     //Brushless
     val1 = 2000;
     //delay(500);
-    myservo1.writeMicroseconds(val1);
+    Brush2.writeMicroseconds(val1);
     Serial.println(val1);
 
 
@@ -336,20 +342,20 @@ void loop() {
       Serial.print(" in");
     }
 
-
+    //Brushless
     //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
     if (cm <= 20) {
       //Brushless
       val2 = 2000;
       // delay(500);
-      myservo2.writeMicroseconds(val2);
+      Brush2.writeMicroseconds(val2);
       Serial.println(val2);
     }
     else {
       //Brushless
       val1 = 2000;
       //delay(500);
-      myservo1.writeMicroseconds(val1);
+      Brush1.writeMicroseconds(val1);
       Serial.println(val1);
     }
 
