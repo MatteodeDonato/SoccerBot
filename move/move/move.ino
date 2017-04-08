@@ -10,8 +10,11 @@
 int compassAddress = 0x01; //we got this from I2C Scanner
 int TestValue;  //variable where we will store compass heading
 int FWD;
+
+//Enstop Switch
 const int buttonPin = 6;     // the number of the pushbutton pin
 int buttonState = 0;         // variable for reading the pushbutton status
+
 // the follow variables are long's because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
 long time = 0;         // the last time the output pin was toggled
@@ -245,7 +248,7 @@ void loop() {
 
 
 
-
+  //Enstop Switch
   buttonState = digitalRead(buttonPin);
   Serial.println(buttonState);
 
