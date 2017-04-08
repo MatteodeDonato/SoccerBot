@@ -4,7 +4,7 @@
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 #include <Math.h>
 #include <Wire.h>
-#include <Servo.h> 
+#include <Servo.h>
 
 
 int compassAddress = 0x01; //we got this from I2C Scanner
@@ -47,6 +47,18 @@ const unsigned int MAX_DIST = 23200;
   Send register address and the byte value you want to write the magnetometer and
   loads the destination register with the value you send
 */
+
+
+//Brushless
+
+
+Servo myservo1;  // create servo object to control a servo
+
+Servo myservo2;  // create servo object to control a servo
+
+int val1;    // variable to read the value from the analog pin
+int val2;    // variable to read the value from the analog pin
+
 void Writei2cRegisters(byte numberbytes, byte command)
 {
   byte i = 0;
@@ -107,11 +119,11 @@ void get_TCS34725ID(void)
 
 Adafruit_MotorShield motorShield = Adafruit_MotorShield();
 
-Adafruit_DCMotor *frontLeft = motorShield.getMotor(1);
-Adafruit_DCMotor *backLeft = motorShield.getMotor(2);
-Adafruit_DCMotor *frontRight = motorShield.getMotor(3);
-Adafruit_DCMotor *backRight = motorShield.getMotor(4);
-int speed1 = 70;
+Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
+Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
+Adafruit_DCMotor *frontRight = motorShield.getMotor(4);
+Adafruit_DCMotor *backRight = motorShield.getMotor(3);
+int speed1 = 100;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
@@ -152,7 +164,10 @@ void setup() {
   Serial.begin(9600);
 
 
+  //brushless
 
+  myservo1.attach(8);  // attaches the servo on pin 9 to the servo object
+  myservo2.attach(9);  // attaches the servo on pin 9 to the servo object
 }
 
 
@@ -172,6 +187,8 @@ void ReadCompassSensor() {
 }
 //loop runs repeatedly
 void loop() {
+
+
 
   ReadCompassSensor();  //calls the function listed below
   Serial.print("compass:\t"); //prints the compass heading
@@ -213,10 +230,10 @@ void loop() {
     frontRight->run(FORWARD);
     backRight->run(FORWARD);
     delay(500);
-    frontLeft->run(FORWARD);
-      backLeft->run(FORWARD);
+    frontLeft->run(BACKWARD);
+    backLeft->run(FORWARD);
     frontRight->run(BACKWARD);
-    backRight->run(BACKWARD);
+    backRight->run(FORWARD);
     delay(200);
   }
 
@@ -226,35 +243,40 @@ void loop() {
   buttonState = digitalRead(buttonPin);
   Serial.println(buttonState);
 
-  
+
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
   if (buttonState ==  LOW ) {
-   
+
+    //Brushless
+    val1 = 2000;
+    //delay(500);
+    myservo1.writeMicroseconds(val1);
+    Serial.println(val1);
 
 
 
-    if ((InfraredBall.Direction > 3) && (InfraredBall.Direction < 8)) {
+    if ((InfraredBall.Direction > 4) && (InfraredBall.Direction < 6)) {
       Serial.println("ball dead ahead");
       frontLeft->run(FORWARD);
       backLeft->run(FORWARD);
       frontRight->run(BACKWARD);
       backRight->run(BACKWARD);
 
-    } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 4)) {
+    } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 5)) {
       Serial.println("ball to the left");
-      frontLeft->run(FORWARD);
+      frontLeft->run(BACKWARD);
       backLeft->run(FORWARD);
-      frontRight->run(FORWARD);
+      frontRight->run(BACKWARD);
       backRight->run(FORWARD);
 
     }
-    else if ((InfraredBall.Direction > 6) && (InfraredBall.Direction < 8)) {
+    else if ((InfraredBall.Direction > 5) && (InfraredBall.Direction < 8)) {
       Serial.println("ball to the right");
       frontLeft->run(BACKWARD);
-      backLeft->run(BACKWARD);
+      backLeft->run(FORWARD);
       frontRight->run(BACKWARD);
-      backRight->run(BACKWARD);
+      backRight->run(FORWARD);
 
     }
   }
@@ -267,6 +289,7 @@ void loop() {
 
   //botton press here
   else {
+
 
 
     // if the input just went from LOW and HIGH and we've waited long enough
@@ -316,12 +339,18 @@ void loop() {
 
     //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
     if (cm <= 20) {
-      digitalWrite(3, HIGH);
-      digitalWrite(2, LOW);
+      //Brushless
+      val2 = 2000;
+      // delay(500);
+      myservo2.writeMicroseconds(val2);
+      Serial.println(val2);
     }
     else {
-      digitalWrite(2, LOW);
-      digitalWrite(3, HIGH);
+      //Brushless
+      val1 = 2000;
+      //delay(500);
+      myservo1.writeMicroseconds(val1);
+      Serial.println(val1);
     }
 
 
