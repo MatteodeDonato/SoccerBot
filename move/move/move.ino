@@ -166,7 +166,7 @@ void setup() {
 
   //brushless
 
-  Brush1.attach(8);  // attaches the servo on pin 9 to the servo object
+  Brush1.attach(8);  // attaches the servo on pin 8 to the servo object
   Brush2.attach(9);  // attaches the servo on pin 9 to the servo object
 }
 
@@ -255,7 +255,7 @@ void loop() {
   if (buttonState ==  LOW ) {
 
     //Brushless
-    val1 = 2000;
+    val1 = 2000; //from 1000-2000
     //delay(500);
     Brush2.writeMicroseconds(val1);
     Serial.println(val1);
@@ -346,14 +346,14 @@ void loop() {
     //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
     if (cm <= 20) {
       //Brushless
-      val2 = 2000;
+      val2 = 2000;  //from 1000-2000
       // delay(500);
       Brush2.writeMicroseconds(val2);
       Serial.println(val2);
     }
     else {
       //Brushless
-      val1 = 2000;
+      val1 = 2000;  //from 1000-2000
       //delay(500);
       Brush1.writeMicroseconds(val1);
       Serial.println(val1);
