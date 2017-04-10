@@ -219,17 +219,17 @@ void loop() {
 
 
   //color sensing
-  Serial.println("Clear");
-  Serial.println(clear_color);
-  Serial.println("Red");
-  Serial.println(red_color);
+  // Serial.println("Clear");
+  //  Serial.println(clear_color);
+  // Serial.println("Red");
+  // Serial.println(red_color);
   Serial.println("Green");
   Serial.println(green_color);
-  Serial.println("Blue");
-  Serial.println(blue_color);
+  // Serial.println("Blue");
+  // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 150) && (green_color < 230)) {
+  if ((green_color > 150) && (green_color < 290)) {
     Serial.println("detecting green");
     //delay(500);
   } else {
@@ -250,12 +250,13 @@ void loop() {
 
   //Enstop Switch
   buttonState = digitalRead(buttonPin);
+  Serial.println("button");
   Serial.println(buttonState);
 
 
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
-  if (buttonState ==  LOW ) {
+  if (buttonState ==  0 ) {
 
     //Brushless
     val1 = 2000; //from 1000-2000
@@ -290,17 +291,11 @@ void loop() {
     }
   }
 
-
-
-
-
   //GO TO GOAL
 
   //botton press here
   else {
-
-
-
+    Serial.print("pressed");
     // if the input just went from LOW and HIGH and we've waited long enough
     // to ignore any noise on the circuit, toggle the output pin and remember
     // the tim
