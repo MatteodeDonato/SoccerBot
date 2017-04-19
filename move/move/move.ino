@@ -268,26 +268,26 @@ void loop() {
 
     if ((InfraredBall.Direction > 4) && (InfraredBall.Direction < 6)) {
       Serial.println("ball dead ahead");
-      frontLeft->run(FORWARD);
-      backLeft->run(FORWARD);
-      frontRight->run(BACKWARD);
-      backRight->run(BACKWARD);
-
-    } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 5)) {
-      Serial.println("ball to the left");
-      frontLeft->run(FORWARD);
-      backLeft->run(BACKWARD);
-      frontRight->run(FORWARD);
-      backRight->run(BACKWARD);
-
-    }
-    else if ((InfraredBall.Direction > 5) && (InfraredBall.Direction < 8)) {
-      Serial.println("ball to the right");
       frontLeft->run(BACKWARD);
       backLeft->run(FORWARD);
       frontRight->run(BACKWARD);
       backRight->run(FORWARD);
 
+    } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 5)) {
+      Serial.println("ball to the left");
+     frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+      frontRight->run(BACKWARD);
+      backRight->run(BACKWARD);
+
+
+    }
+    else if ((InfraredBall.Direction > 5) && (InfraredBall.Direction < 8)) {
+      Serial.println("ball to the right");
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+      frontRight->run(FORWARD);
+      backRight->run(FORWARD);
     }
   }
 
@@ -362,24 +362,24 @@ void loop() {
 
     if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
       Serial.println("GOAL dead ahead");
-      frontLeft->run(BACKWARD);
-      backLeft->run(BACKWARD);
-      frontRight->run(FORWARD);
-      backRight->run(FORWARD);
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+      frontRight->run(BACKWARD);
+      backRight->run(BACKWARD);
 
     } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
       Serial.println("GOAL to the left");
-      frontLeft->run(FORWARD);
+      frontLeft->run(BACKWARD);
       backLeft->run(FORWARD);
-      frontRight->run(FORWARD);
+      frontRight->run(BACKWARD);
       backRight->run(FORWARD);
 
     }
     else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
       Serial.println("GOAL to the right");
-      frontLeft->run(BACKWARD);
+      frontLeft->run(FORWARD);
       backLeft->run(BACKWARD);
-      frontRight->run(BACKWARD);
+      frontRight->run(FORWARD);
       backRight->run(BACKWARD);
 
     }
