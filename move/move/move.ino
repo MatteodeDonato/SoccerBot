@@ -126,7 +126,7 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *frontRight = motorShield.getMotor(4);
 Adafruit_DCMotor *backRight = motorShield.getMotor(3);
-int speed1 = 100;
+int speed1 = 40;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
@@ -229,7 +229,7 @@ void loop() {
   // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 150) && (green_color < 290)) {
+  if ((green_color > 650) && (green_color < 1200)) {
     Serial.println("detecting green");
     //delay(500);
   } else {
@@ -259,7 +259,7 @@ void loop() {
   if (buttonState ==  0 ) {
 
     //Brushless
-    val1 = 2000; //from 1000-2000
+    val1 = 1800; //from 1000-2000
     //delay(500);
     Brush2.writeMicroseconds(val1);
     Serial.println(val1);
@@ -295,6 +295,7 @@ void loop() {
 
   //botton press here
   else {
+    delay(500);
     Serial.print("pressed");
     // if the input just went from LOW and HIGH and we've waited long enough
     // to ignore any noise on the circuit, toggle the output pin and remember
