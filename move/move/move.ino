@@ -275,7 +275,7 @@ void loop() {
 
     } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 5)) {
       Serial.println("ball to the left");
-     frontLeft->run(BACKWARD);
+      frontLeft->run(BACKWARD);
       backLeft->run(BACKWARD);
       frontRight->run(BACKWARD);
       backRight->run(BACKWARD);
@@ -388,6 +388,7 @@ void loop() {
   }
 
 }
+
 
 
 
