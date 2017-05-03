@@ -256,12 +256,12 @@ void loop() {
 
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
-  if (buttonState ==  0 ) {
+  if (buttonState ==  1 ) {
 
     //Brushless
-    val1 = 1800; //from 1000-2000
-    //delay(500);
-    Brush2.writeMicroseconds(val1);
+    val1 = 1500; //from 1000-2000
+    delay(500);
+    Brush1.writeMicroseconds(val1);
     Serial.println(val1);
 
 
@@ -353,8 +353,9 @@ void loop() {
     else {
       //Brushless
       val1 = 2000;  //from 1000-2000
+      val2 = 1500;  //from 1000-2000
       //delay(500);
-      Brush1.writeMicroseconds(val1);
+      Brush2.writeMicroseconds(val1);
       Serial.println(val1);
     }
 
