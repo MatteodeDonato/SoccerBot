@@ -352,7 +352,6 @@ void loop() {
     }
     else {
       //Brushless
-      val1 = 2000;  //from 1000-2000
       val2 = 1500;  //from 1000-2000
       //delay(500);
       Brush2.writeMicroseconds(val1);
@@ -389,6 +388,7 @@ void loop() {
   }
 
 }
+
 
 
 
