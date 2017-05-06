@@ -17,7 +17,7 @@ int buttonState = 0;         // variable for reading the pushbutton status
 
 // the follow variables are long's because the time, measured in miliseconds,
 // will quickly become a bigger number than can be stored in an int.
-long time = 0;         // the last time the output pin was toggled
+long time = 0;         // the last time the outpust pin was toggled
 long debounce = 200;   // the debounce time, increase if the output flickers
 
 
@@ -124,15 +124,15 @@ Adafruit_MotorShield motorShield = Adafruit_MotorShield();
 
 Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
-Adafruit_DCMotor *frontRight = motorShield.getMotor(4);
-Adafruit_DCMotor *backRight = motorShield.getMotor(3);
-int speed1 = 40;
+//Adafruit_DCMotor *frontRight = motorShield.getMotor(4);
+//Adafruit_DCMotor *backRight = motorShield.getMotor(3);
+int speed1 = 100;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
   backLeft->setSpeed(speed1);
-  frontRight->setSpeed(speed1);
-  backRight->setSpeed(speed1);
+//  frontRight->setSpeed(speed1);
+//  backRight->setSpeed(speed1);
 
   Wire.begin();
   Serial.begin(9600);  // start serial for output
@@ -194,7 +194,7 @@ void loop() {
 
 
   ReadCompassSensor();  //calls the function listed below
-  Serial.print("compass:\t"); //prints the compass heading
+  Serial.println("compass: "); //prints the compass heading
   Serial.println(TestValue);
   //delay(1); //delay for reading output
 
@@ -202,9 +202,9 @@ void loop() {
   //IR
   InfraredResult InfraredBall = InfraredSeeker::ReadAC();
 
-  Serial.print(InfraredBall.Direction); //Print the Direction Number
+  //Serial.print(InfraredBall.Direction); //Print the Direction Number
   Serial.print("\t"); // Print a tab
-  Serial.print(InfraredBall.Strength); //Print the Strength Number
+  //Serial.print(InfraredBall.Strength); //Print the Strength Number
   Serial.println(); //Print a new line
 
   //delay(100); //delay a tenth of a second
@@ -229,20 +229,20 @@ void loop() {
   // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 650) && (green_color < 1200)) {
+  if ((green_color > 1100) && (green_color < 1500)) {
     Serial.println("detecting green");
     //delay(500);
   } else {
     Serial.println("detecting not green");
-    frontLeft->run(BACKWARD);
-    backLeft->run(BACKWARD);
-    frontRight->run(FORWARD);
-    backRight->run(FORWARD);
-    delay(500);
-    frontLeft->run(BACKWARD);
+    frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
-    frontRight->run(BACKWARD);
-    backRight->run(FORWARD);
+    //frontRight->run(FORWARD);
+    //backRight->run(FORWARD);
+    delay(500);
+    frontLeft->run(FORWARD);
+    backLeft->run(FORWARD);
+    //frontRight->run(BACKWARD);
+   // backRight->run(FORWARD);
     delay(200);
   }
 
@@ -256,7 +256,7 @@ void loop() {
 
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
-  if (buttonState ==  1 ) {
+  if (!buttonState) {
 
     //Brushless
     val1 = 1500; //from 1000-2000
@@ -268,26 +268,26 @@ void loop() {
 
     if ((InfraredBall.Direction > 4) && (InfraredBall.Direction < 6)) {
       Serial.println("ball dead ahead");
-      frontLeft->run(BACKWARD);
-      backLeft->run(FORWARD);
-      frontRight->run(BACKWARD);
-      backRight->run(FORWARD);
+      frontLeft->run(FORWARD);
+      backLeft->run(BACKWARD);
+//      frontRight->run(BACKWARD);
+  //    backRight->run(FORWARD);
 
     } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 5)) {
       Serial.println("ball to the left");
-      frontLeft->run(BACKWARD);
-      backLeft->run(BACKWARD);
-      frontRight->run(BACKWARD);
-      backRight->run(BACKWARD);
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+//      frontRight->run(BACKWARD);
+  //    backRight->run(BACKWARD);
 
 
     }
     else if ((InfraredBall.Direction > 5) && (InfraredBall.Direction < 8)) {
       Serial.println("ball to the right");
-      frontLeft->run(FORWARD);
-      backLeft->run(FORWARD);
-      frontRight->run(FORWARD);
-      backRight->run(FORWARD);
+      frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+//      frontRight->run(FORWARD);
+  //    backRight->run(FORWARD);
     }
   }
 
@@ -364,23 +364,23 @@ void loop() {
       Serial.println("GOAL dead ahead");
       frontLeft->run(FORWARD);
       backLeft->run(FORWARD);
-      frontRight->run(BACKWARD);
-      backRight->run(BACKWARD);
+     // frontRight->run(BACKWARD);
+      //backRight->run(BACKWARD);
 
     } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
       Serial.println("GOAL to the left");
       frontLeft->run(BACKWARD);
       backLeft->run(FORWARD);
-      frontRight->run(BACKWARD);
-      backRight->run(FORWARD);
+//      frontRight->run(BACKWARD);
+  //    backRight->run(FORWARD);
 
     }
     else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
       Serial.println("GOAL to the right");
       frontLeft->run(FORWARD);
       backLeft->run(BACKWARD);
-      frontRight->run(FORWARD);
-      backRight->run(BACKWARD);
+//      frontRight->run(FORWARD);
+  //    backRight->run(BACKWARD);
 
     }
     else
