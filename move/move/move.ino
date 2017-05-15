@@ -40,7 +40,7 @@ unsigned int green_color = 0;
 unsigned int blue_color = 0;
 //ultrasonic
 // Pins
-const int TRIG_PIN = 4;
+/*const int TRIG_PIN = 4;
 const int ECHO_PIN = 5;
 
 // Anything over 400 cm (23200 us pulse) is "out of range"
@@ -52,15 +52,6 @@ const unsigned int MAX_DIST = 23200;
 */
 
 
-//Brushless
-
-
-Servo Brush1;  // create servo object to control a servo
-
-Servo Brush2;  // create servo object to control a servo
-
-int val1;    // variable to read the value from the analog pin
-int val2;    // variable to read the value from the analog pin
 
 void Writei2cRegisters(byte numberbytes, byte command)
 {
@@ -124,15 +115,16 @@ Adafruit_MotorShield motorShield = Adafruit_MotorShield();
 
 Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
-//Adafruit_DCMotor *frontRight = motorShield.getMotor(4);
+Adafruit_DCMotor *spin = motorShield.getMotor(4);
 //Adafruit_DCMotor *backRight = motorShield.getMotor(3);
 int speed1 = 100;
+int speed2 = 200;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
   backLeft->setSpeed(speed1);
-//  frontRight->setSpeed(speed1);
-//  backRight->setSpeed(speed1);
+  //  frontRight->setSpeed(speed1);
+  //  backRight->setSpeed(speed1);
 
   Wire.begin();
   Serial.begin(9600);  // start serial for output
@@ -160,17 +152,14 @@ void setup() {
   //ULTRASONIC
 
   // The Trigger pin will tell the sensor to range find
-  pinMode(TRIG_PIN, OUTPUT);
+/*  pinMode(TRIG_PIN, OUTPUT);
   digitalWrite(TRIG_PIN, LOW);
-
+*/
   // We'll use the serial monitor to view the sensor output
   Serial.begin(9600);
 
 
-  //brushless
 
-  Brush1.attach(8);  // attaches the servo on pin 8 to the servo object
-  Brush2.attach(9);  // attaches the servo on pin 9 to the servo object
 }
 
 
@@ -229,7 +218,7 @@ void loop() {
   // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 1100) && (green_color < 1500)) {
+  if ((green_color > 460) && (green_color < 510)) {
     Serial.println("detecting green");
     //delay(500);
   } else {
@@ -242,7 +231,7 @@ void loop() {
     frontLeft->run(FORWARD);
     backLeft->run(FORWARD);
     //frontRight->run(BACKWARD);
-   // backRight->run(FORWARD);
+    // backRight->run(FORWARD);
     delay(200);
   }
 
@@ -256,38 +245,33 @@ void loop() {
 
   // check if the pushbutton is pressed.
   // if it is, the buttonState is HIGH:
-  if (!buttonState) {
+  if (buttonState) {
 
-    //Brushless
-    val1 = 1500; //from 1000-2000
-    delay(500);
-    Brush1.writeMicroseconds(val1);
-    Serial.println(val1);
-
-
+    // FLY
+    spin->run(FORWARD);
 
     if ((InfraredBall.Direction > 4) && (InfraredBall.Direction < 6)) {
       Serial.println("ball dead ahead");
-      frontLeft->run(FORWARD);
-      backLeft->run(BACKWARD);
-//      frontRight->run(BACKWARD);
-  //    backRight->run(FORWARD);
+      frontLeft->run(BACKWARD);
+      backLeft->run(FORWARD);
+      //      frontRight->run(BACKWARD);
+      //    backRight->run(FORWARD);
 
     } else if ((InfraredBall.Direction > 0) && (InfraredBall.Direction < 5)) {
       Serial.println("ball to the left");
-      frontLeft->run(FORWARD);
-      backLeft->run(FORWARD);
-//      frontRight->run(BACKWARD);
-  //    backRight->run(BACKWARD);
+      frontLeft->run(BACKWARD);
+      backLeft->run(BACKWARD);
+      //      frontRight->run(BACKWARD);
+      //    backRight->run(BACKWARD);
 
 
     }
     else if ((InfraredBall.Direction > 5) && (InfraredBall.Direction < 8)) {
       Serial.println("ball to the right");
-      frontLeft->run(BACKWARD);
-      backLeft->run(BACKWARD);
-//      frontRight->run(FORWARD);
-  //    backRight->run(FORWARD);
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+      //      frontRight->run(FORWARD);
+      //    backRight->run(FORWARD);
     }
   }
 
@@ -295,15 +279,18 @@ void loop() {
 
   //botton press here
   else {
-    delay(500);
+    //delay(500);
     Serial.print("pressed");
     // if the input just went from LOW and HIGH and we've waited long enough
     // to ignore any noise on the circuit, toggle the output pin and remember
     // the tim
 
+    // FLY
+    spin->run(FORWARD);
+
 
     //UTRASONIC
-
+/*
     unsigned long t1;
     unsigned long t2;
     unsigned long pulse_width;
@@ -334,60 +321,51 @@ void loop() {
     // Print out results
     if ( pulse_width > MAX_DIST ) {
       Serial.println("Out of range");
-    } else {
+    }
+    else {
       Serial.println(cm);
       Serial.print(" cm \t");
       Serial.println(inches);
       Serial.print(" in");
-    }
-
-    //Brushless
-    //spin roller backwards until ultrasonic sees goal within certian distance then reverse roller to lauch ball.
-    if (cm <= 20) {
-      //Brushless
-      val2 = 2000;  //from 1000-2000
-      // delay(500);
-      Brush2.writeMicroseconds(val2);
-      Serial.println(val2);
-    }
-    else {
-      //Brushless
-      val2 = 1500;  //from 1000-2000
-      //delay(500);
-      Brush2.writeMicroseconds(val1);
-      Serial.println(val1);
-    }
 
 
+      // FLY
+      spin->run(BACKWARD);
+    }*/
 
-    if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
-      Serial.println("GOAL dead ahead");
-      frontLeft->run(FORWARD);
-      backLeft->run(FORWARD);
-     // frontRight->run(BACKWARD);
-      //backRight->run(BACKWARD);
-
-    } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
-      Serial.println("GOAL to the left");
-      frontLeft->run(BACKWARD);
-      backLeft->run(FORWARD);
-//      frontRight->run(BACKWARD);
-  //    backRight->run(FORWARD);
-
-    }
-    else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
-      Serial.println("GOAL to the right");
-      frontLeft->run(FORWARD);
-      backLeft->run(BACKWARD);
-//      frontRight->run(FORWARD);
-  //    backRight->run(BACKWARD);
-
-    }
-    else
-      Serial.println("GOAL???");
   }
 
+
+
+
+  if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
+    Serial.println("GOAL dead ahead");
+    frontLeft->run(FORWARD);
+    backLeft->run(FORWARD);
+    // frontRight->run(BACKWARD);
+    //backRight->run(BACKWARD);
+
+  } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
+    Serial.println("GOAL to the left");
+    frontLeft->run(BACKWARD);
+    backLeft->run(FORWARD);
+    //      frontRight->run(BACKWARD);
+    //    backRight->run(FORWARD);
+
+  }
+  else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
+    Serial.println("GOAL to the right");
+    frontLeft->run(FORWARD);
+    backLeft->run(BACKWARD);
+    //      frontRight->run(FORWARD);
+    //    backRight->run(BACKWARD);
+
+  }
+  else
+    Serial.println("GOAL???");
 }
+
+
 
 
 
