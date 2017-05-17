@@ -41,12 +41,12 @@ unsigned int blue_color = 0;
 //ultrasonic
 // Pins
 /*const int TRIG_PIN = 4;
-const int ECHO_PIN = 5;
+  const int ECHO_PIN = 5;
 
-// Anything over 400 cm (23200 us pulse) is "out of range"
-const unsigned int MAX_DIST = 23200;
+  // Anything over 400 cm (23200 us pulse) is "out of range"
+  const unsigned int MAX_DIST = 23200;
 
-/*
+  /*
   Send register address and the byte value you want to write the magnetometer and
   loads the destination register with the value you send
 */
@@ -117,12 +117,13 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *spin = motorShield.getMotor(4);
 //Adafruit_DCMotor *backRight = motorShield.getMotor(3);
-int speed1 = 100;
-int speed2 = 200;
+int speed1 = 25;
+int speed2 = 100;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
   backLeft->setSpeed(speed1);
+  spin->setSpeed(speed2);
   //  frontRight->setSpeed(speed1);
   //  backRight->setSpeed(speed1);
 
@@ -147,14 +148,16 @@ void setup() {
   ReadCompassSensor();
   FWD = TestValue;
 
-  pinMode(buttonPin, INPUT);
+  pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(4, OUTPUT);
+  digitalWrite(4, LOW);
 
   //ULTRASONIC
 
   // The Trigger pin will tell the sensor to range find
-/*  pinMode(TRIG_PIN, OUTPUT);
-  digitalWrite(TRIG_PIN, LOW);
-*/
+  /*  pinMode(TRIG_PIN, OUTPUT);
+    digitalWrite(TRIG_PIN, LOW);
+  */
   // We'll use the serial monitor to view the sensor output
   Serial.begin(9600);
 
@@ -191,9 +194,9 @@ void loop() {
   //IR
   InfraredResult InfraredBall = InfraredSeeker::ReadAC();
 
-  //Serial.print(InfraredBall.Direction); //Print the Direction Number
+  Serial.print(InfraredBall.Direction); //Print the Direction Number
   Serial.print("\t"); // Print a tab
-  //Serial.print(InfraredBall.Strength); //Print the Strength Number
+  Serial.print(InfraredBall.Strength); //Print the Strength Number
   Serial.println(); //Print a new line
 
   //delay(100); //delay a tenth of a second
@@ -286,83 +289,84 @@ void loop() {
     // the tim
 
     // FLY
-    spin->run(FORWARD);
+     spin->run(BACKWARD);
 
 
     //UTRASONIC
-/*
-    unsigned long t1;
-    unsigned long t2;
-    unsigned long pulse_width;
-    float cm;
-    float inches;
+    /*
+        unsigned long t1;
+        unsigned long t2;
+        unsigned long pulse_width;
+        float cm;
+        float inches;
 
-    // Hold the trigger pin high for at least 10 us
-    digitalWrite(TRIG_PIN, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(TRIG_PIN, LOW);
+        // Hold the trigger pin high for at least 10 us
+        digitalWrite(TRIG_PIN, HIGH);
+        delayMicroseconds(10);
+        digitalWrite(TRIG_PIN, LOW);
 
-    // Wait for pulse on echo pin
-    while ( digitalRead(ECHO_PIN) == 0 );
+        // Wait for pulse on echo pin
+        while ( Read(ECHO_PIN) == 0 );
 
-    // Measure how long the echo pin was held high (pulse width)
-    // Note: the micros() counter will overflow after ~70 min
-    t1 = micros();
-    while ( digitalRead(ECHO_PIN) == 1);
-    t2 = micros();
-    pulse_width = t2 - t1;
+        // Measure how long the echo pin was held high (pulse width)
+        // Note: the micros() counter will overflow after ~70 min
+        t1 = micros();
+        while ( Read(ECHO_PIN) == 1);
+        t2 = micros();
+        pulse_width = t2 - t1;
 
-    // Calculate distance in centimeters and inches. The constants
-    // are found in the datasheet, and calculated from the assumed speed
-    //of sound in air at sea level (~340 m/s).
-    cm = pulse_width / 58.0;
-    inches = pulse_width / 148.0;
+        // Calculate distance in centimeters and inches. The constants
+        // are found in the datasheet, and calculated from the assumed speed
+        //of sound in air at sea level (~340 m/s).
+        cm = pulse_width / 58.0;
+        inches = pulse_width / 148.0;
 
-    // Print out results
-    if ( pulse_width > MAX_DIST ) {
-      Serial.println("Out of range");
+        // Print out results
+        if ( pulse_width > MAX_DIST ) {
+          Serial.println("Out of range");
+        }
+        else {
+          Serial.println(cm);
+          Serial.print(" cm \t");
+          Serial.println(inches);
+          Serial.print(" in");
+
+
+          // FLY
+          spin->run(BACKWARD);
+        }
+
+      }*/
+
+
+
+
+    if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
+      Serial.println("GOAL dead ahead");
+      frontLeft->run(FORWARD);
+      backLeft->run(FORWARD);
+      // frontRight->run(BACKWARD);
+      //backRight->run(BACKWARD);
+
+    } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
+      Serial.println("GOAL to the left");
+      frontLeft->run(BACKWARD);
+      backLeft->run(FORWARD);
+      //      frontRight->run(BACKWARD);
+      //    backRight->run(FORWARD);
+
     }
-    else {
-      Serial.println(cm);
-      Serial.print(" cm \t");
-      Serial.println(inches);
-      Serial.print(" in");
+    else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
+      Serial.println("GOAL to the right");
+      frontLeft->run(FORWARD);
+      backLeft->run(BACKWARD);
+      //      frontRight->run(FORWARD);
+      //    backRight->run(BACKWARD);
 
-
-      // FLY
-      spin->run(BACKWARD);
-    }*/
-
+    }
+    else
+      Serial.println("GOAL???");
   }
-
-
-
-
-  if ((TestValue > FWD - 10) && (TestValue < (FWD + 10) % 360)) {
-    Serial.println("GOAL dead ahead");
-    frontLeft->run(FORWARD);
-    backLeft->run(FORWARD);
-    // frontRight->run(BACKWARD);
-    //backRight->run(BACKWARD);
-
-  } else if ((TestValue < FWD - 10) && (TestValue > (FWD - 180) % 360)) {
-    Serial.println("GOAL to the left");
-    frontLeft->run(BACKWARD);
-    backLeft->run(FORWARD);
-    //      frontRight->run(BACKWARD);
-    //    backRight->run(FORWARD);
-
-  }
-  else if ((TestValue > FWD + 10) && (TestValue > (FWD +  180) % 360)) {
-    Serial.println("GOAL to the right");
-    frontLeft->run(FORWARD);
-    backLeft->run(BACKWARD);
-    //      frontRight->run(FORWARD);
-    //    backRight->run(BACKWARD);
-
-  }
-  else
-    Serial.println("GOAL???");
 }
 
 
