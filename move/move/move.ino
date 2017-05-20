@@ -117,7 +117,7 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *spin = motorShield.getMotor(4);
 //Adafruit_DCMotor *backRight = motorShield.getMotor(3);
-int speed1 = 80;
+int speed1 =100;
 int speed2 = 100;
 void setup() {
   motorShield.begin();
@@ -221,17 +221,17 @@ void loop() {
   // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 400) && (green_color < 680)) {
+  if ((green_color > 230) && (green_color < 680)) {
     Serial.println("detecting green");
-    //delay(500);
+    delay(500);
   } else {
     Serial.println("detecting not green");
-    frontLeft->run(FORWARD);
-    backLeft->run(FORWARD);
+    frontLeft->run(BACKWARD);
+    backLeft->run(BACKWARD);
     //frontRight->run(FORWARD);
     //backRight->run(FORWARD);
     delay(500);
-    frontLeft->run(FORWARD);
+    frontLeft->run(BACKWARD);
     backLeft->run(FORWARD);
     //frontRight->run(BACKWARD);
     // backRight->run(FORWARD);
