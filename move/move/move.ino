@@ -117,13 +117,13 @@ Adafruit_DCMotor *frontLeft = motorShield.getMotor(2);
 Adafruit_DCMotor *backLeft = motorShield.getMotor(1);
 Adafruit_DCMotor *spin = motorShield.getMotor(4);
 //Adafruit_DCMotor *backRight = motorShield.getMotor(3);
-int speed1 =100;
-int speed2 = 100;
+int speed1 =255;
+//int speed2 = 100;
 void setup() {
   motorShield.begin();
   frontLeft->setSpeed(speed1);
   backLeft->setSpeed(speed1);
-  spin->setSpeed(speed2);
+  //spin->setSpeed(speed2);
   //  frontRight->setSpeed(speed1);
   //  backRight->setSpeed(speed1);
 
@@ -221,9 +221,9 @@ void loop() {
   // Serial.println(blue_color);
   // stay on green
 
-  if ((green_color > 230) && (green_color < 680)) {
+ /* if ((green_color > 230) && (green_color < 680)) {
     Serial.println("detecting green");
-    delay(500);
+    //delay(500);
   } else {
     Serial.println("detecting not green");
     frontLeft->run(BACKWARD);
@@ -237,7 +237,7 @@ void loop() {
     // backRight->run(FORWARD);
     delay(200);
   }
-
+*/
 
 
   //Enstop Switch
@@ -251,7 +251,7 @@ void loop() {
   if (buttonState) {
 
     // FLY
-    spin->run(FORWARD);
+   // spin->run(FORWARD);
 
     if ((InfraredBall.Direction > 4) && (InfraredBall.Direction < 6)) {
       Serial.println("ball dead ahead");
@@ -289,7 +289,7 @@ void loop() {
     // the tim
 
     // FLY
-     spin->run(BACKWARD);
+   //  spin->run(BACKWARD);
 
 
     //UTRASONIC
